@@ -27,14 +27,10 @@ def openbook(workbook, sheet_type='USR'):
         sheet = openedbook.sheet_by_name('Full USR')
     elif sheet_type == 'ALW':
         sheet = openedbook.sheet_by_name('Faslane')
-    row = 1
     header = sheet.row_values(0)
     for index in range(len(header)):
         header[index] = header[index].replace(' ', '_')
 
-    # use the header values to create a dictionary
-    sp_dictionary = {}
-    al_dictionary = {}
     unit = []
     if sheet_type == 'USR':
         for x in range(1, sheet.nrows):
