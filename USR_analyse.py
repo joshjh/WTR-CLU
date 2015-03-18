@@ -1,6 +1,7 @@
 __author__ = 'josh'
 import ALW_interpreter
 from CLU_FIXED_VALUES import *
+import datetime
 """ Analyse a USR object """
 
 def run(SP_object, SP_allow_db, errors):
@@ -8,6 +9,7 @@ def run(SP_object, SP_allow_db, errors):
     __check_fixed_values__(SP_object, errors)
     __check_against_ALW__(SP_object, SP_allow_db, errors)
     __check_acting_local__(SP_object, errors)
+    __get_warrants__(SP_object)
 
 def __check_acting_local__(SP_object, errors):
     if SP_object.Acting_Paid_Rank != '':
@@ -18,6 +20,7 @@ def __check_fixed_values__(SP_object, errors):
     if SP_object.whois == ('TRIUMPH', 'OFFICER OF THE DAY|1560669'):
         pass
     else:
+
         if SP_object.Temp_Allowance_Location in ('ASSLQU', 'INTRANSIT', 'GBR'):
                 print('--- ASSESS {} {} should be in the LANDED LOG'.format(SP_object.whois, SP_object.Assignment_Number))
 
@@ -45,6 +48,41 @@ def __check_fixed_values__(SP_object, errors):
                     if SP_object_dict[key] != FIX_VALUES_GRUNTER_SO[key]:
                         print (key,' for Service Person: ',  SP_object.whois, 'is: ', SP_object_dict[key], 'should be: ',
                                FIX_VALUES_GRUNTER_SO[key])
+
+def __get_warrants__(sp_object, END_OF_YEAR=1):
+    leave_year_end = datetime.datetime(2016, 4, 1)
+    # CATCH errors for non_fav dates (stub accounts etc)
+    try:
+        int_time = int(sp_object.FAV_Date)
+    except ValueError:
+        print ('no FAD date found for {}'.format(sp_object.whois))
+
+    # stupid excel date integer formats run from 01-01-1900
+    year_zero = datetime.datetime(1899, 12, 30)
+    warrants = 0
+
+    # if end of year, we for the twelve month period (leave year end - 1 year, and one period of 36 days
+    if END_OF_YEAR == 1:
+        running_time = leave_year_end - datetime.timedelta(days=366) + datetime.timedelta(days=36)
+    # for new joiners, we need to go from the start of entitlement.  This should really be SP.startdate
+    else:
+        running_time = datetime.datetime.today() + datetime.timedelta(days=36)
+    # test if inttime got set.
+    try:
+        int_time
+        fav_date = year_zero + datetime.timedelta(days=int_time)
+        # print(leave_year_end)
+        # print(fav_date)
+        while running_time < leave_year_end and running_time < fav_date:
+            warrants += 1
+            running_time += datetime.timedelta(days=36)
+
+    except NameError:
+        pass
+    if END_OF_YEAR == 1:
+        print ('has {} warrants to leave year ending {}'.format(warrants, leave_year_end))
+    else:
+        print ('has {} warrants to from today'.format(warrants, leave_year_end))
 
 def __check_against_ALW__(SP_object, SP_allow_db, errors):
     '''
