@@ -33,7 +33,15 @@ def postcode_check(allow_obj, errors):
         matches.append(re.findall(x, ps.replace(" ", ""))) # STRIP WHITESPACE BEFORE MATCHING
 
     match = (sorted(matches)[-1])
-    print (match)
+    if match:
+        match.append(allow_obj.NAME)
+        match.append(allow_obj.Service_No)
+        match.append(allow_obj.GYH_T_Mileage_To_Nominated_Address)
+        with open('output_postcodes.txt','a') as fileout:
+            outline = match[0] + ':' + match[1] + ':' + str(match[2]) + ':' + str(match[3])
+            fileout.write(outline)
+            fileout.write('\n')
+            fileout.close()
     ## some writing of postcode for miles to pick up seperately.
 
 
