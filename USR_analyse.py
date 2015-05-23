@@ -9,7 +9,7 @@ def run(SP_object, SP_allow_db, errors):
     __check_fixed_values__(SP_object, errors)
     __check_against_ALW__(SP_object, SP_allow_db, errors)
     __check_acting_local__(SP_object, errors)
-    __get_warrants__(SP_object)
+   # __get_warrants__(SP_object)
 
 def __check_acting_local__(SP_object, errors):
     if SP_object.Acting_Paid_Rank != '':

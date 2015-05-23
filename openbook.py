@@ -27,9 +27,20 @@ def openbook(workbook, sheet_type='USR'):
         sheet = openedbook.sheet_by_name('Full USR')
     elif sheet_type == 'ALW':
         sheet = openedbook.sheet_by_name('Faslane')
+    elif sheet_type == 'LVE':
+        sheet = openedbook.sheet_by_name('Absence Details')
     header = sheet.row_values(0)
     for index in range(len(header)):
-        header[index] = header[index].replace(' ', '_')
+
+        if sheet_type == 'ALW':
+            header[index] = header[index].replace(' ', '_')
+            header[index] = header[index].replace('(', '_')
+            header[index] = header[index].replace(')', '_')
+            header[index] = header[index].replace('__', '_')
+            # print (header[index])
+
+        else:
+            header[index] = header[index].replace(' ', '_')
 
     unit = []
     if sheet_type == 'USR':
@@ -44,7 +55,12 @@ def openbook(workbook, sheet_type='USR'):
             AL_object = SP(al_dictionary['NAME'], al_dictionary['Service_No'])
             AL_object.setvalues(al_dictionary)
             unit.append(AL_object)
-
+    elif sheet_type == 'LVE':
+        for x in range(1, sheet.nrows):
+            lve_dictionary = dict(zip(header, sheet.row_values(x)))
+            lve_object = SP(lve_dictionary['Full_Name'], lve_dictionary['Employee_Number'])
+            lve_object.setvalues(lve_dictionary)
+            unit.append(lve_object)
     return unit
 
 
